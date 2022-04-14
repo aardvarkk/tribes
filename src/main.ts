@@ -1,5 +1,8 @@
 import "./style.css";
 
+const WIDTH = 256;
+const HEIGHT = 256;
+
 const clearBtn = document.getElementById("clear") as HTMLButtonElement;
 clearBtn.onclick = () => clear();
 
@@ -11,7 +14,7 @@ const ctx = canvas.getContext("2d")!;
 clear();
 
 function clear() {
-  const image = ctx.getImageData(0, 0, 256, 256);
+  const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
   for (let i = 0; i < image.data.length; i += 4) {
     data[i + 0] = data[i + 1] = data[i + 2] = 0;
@@ -20,9 +23,21 @@ function clear() {
   ctx.putImageData(image, 0, 0);
 }
 
+function setPx(data: Uint8ClampedArray, x: number, y: number, value: number) {
+  const idx = 4 * (y * WIDTH + x);
+  data[idx + 0] = data[idx + 1] = data[idx + 2] = value;
+}
+
 function step() {
-  const image = ctx.getImageData(0, 0, 256, 256);
+  const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
-  data[0] = data[1] = data[2] = 0xff;
+
+  for (let y = 0; y < 256; ++y) {
+    for (let x = 0; x < 256; ++x) {
+      if (Math.random() < 0.01) {
+        setPx(data, x, y, 0xff);
+      }
+    }
+  }
   ctx.putImageData(image, 0, 0);
 }
