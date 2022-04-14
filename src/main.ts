@@ -1,28 +1,28 @@
 import "./style.css";
 
-type State = Uint8ClampedArray;
-
 const clearBtn = document.getElementById("clear") as HTMLButtonElement;
 clearBtn.onclick = () => clear();
 
 const stepBtn = document.getElementById("step") as HTMLButtonElement;
 stepBtn.onclick = () => step();
 
-let state: State = new Uint8ClampedArray();
-
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 clear();
 
 function clear() {
-  state = new Uint8ClampedArray(4 * 256 * 256);
-  for (let i = 0; i < state.length; i += 4) {
-    state[i + 3] = 0xff;
+  const image = ctx.getImageData(0, 0, 256, 256);
+  const data = image.data;
+  for (let i = 0; i < image.data.length; i += 4) {
+    data[i + 0] = data[i + 1] = data[i + 2] = 0;
+    data[i + 3] = 0xff;
   }
-  ctx.putImageData(new ImageData(state, 256, 256), 0, 0);
+  ctx.putImageData(image, 0, 0);
 }
 
 function step() {
-  state[0] = state[1] = state[2] = 0xff;
-  ctx.putImageData(new ImageData(state, 256, 256), 0, 0);
+  const image = ctx.getImageData(0, 0, 256, 256);
+  const data = image.data;
+  data[0] = data[1] = data[2] = 0xff;
+  ctx.putImageData(image, 0, 0);
 }
