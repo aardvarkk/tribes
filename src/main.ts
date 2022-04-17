@@ -1,5 +1,12 @@
 import "./style.css";
 
+const INTENSITIES = {
+  EMPTY: 0xff,
+  NATURE: [0xef, 0xd6, 0xa0, 0x88],
+  SHELTER: [0x75, 0x56, 0x35, 0x00],
+  TRADE: [0x75, 0x56, 0x35, 0x00],
+};
+
 const WIDTH = 256;
 const HEIGHT = 256;
 
@@ -22,6 +29,11 @@ function clear() {
   ctx.putImageData(image, 0, 0);
 }
 
+function getPx(data: Uint8ClampedArray, x: number, y: number): number {
+  const idx = 4 * (y * WIDTH + x);
+  return data[idx];
+}
+
 function setPx(data: Uint8ClampedArray, x: number, y: number, value: number) {
   const idx = 4 * (y * WIDTH + x);
   data[idx + 0] = data[idx + 1] = data[idx + 2] = value;
@@ -33,8 +45,12 @@ function step() {
 
   for (let y = 0; y < 256; ++y) {
     for (let x = 0; x < 256; ++x) {
-      if (Math.random() < 0.01) {
-        setPx(data, x, y, 0xff);
+      const value = getPx(data, x, y);
+
+      // Subphase 1
+      // Nature - new nature spawns from 0xff (empty) pixels
+      if (value === INTENSITIES.EMPTY && Math.random() < 0.01) {
+        setPx(data, x, y, INTENSITIES.NATURE[0]);
       }
     }
   }
