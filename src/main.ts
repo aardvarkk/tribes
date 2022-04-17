@@ -16,9 +16,8 @@ clear();
 function clear() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
-  for (let i = 0; i < image.data.length; i += 4) {
-    data[i + 0] = data[i + 1] = data[i + 2] = 0;
-    data[i + 3] = 0xff;
+  for (let i = 0; i < image.data.length; ++i) {
+    data[i] = 0xff;
   }
   ctx.putImageData(image, 0, 0);
 }
