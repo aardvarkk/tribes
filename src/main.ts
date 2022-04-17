@@ -14,7 +14,7 @@ const clearBtn = document.getElementById("clear") as HTMLButtonElement;
 clearBtn.onclick = () => clear();
 
 const stepBtn = document.getElementById("step") as HTMLButtonElement;
-stepBtn.onclick = () => step();
+stepBtn.onclick = () => runSteps();
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
@@ -39,6 +39,15 @@ function setPx(data: Uint8ClampedArray, x: number, y: number, value: number) {
   data[idx + 0] = data[idx + 1] = data[idx + 2] = value;
 }
 
+// Run one (or more) steps (save a bunch of clicking!)
+function runSteps() {
+  const steps = parseInt(
+    (document.getElementById("steps") as HTMLInputElement).value
+  );
+  for (let i = 0; i < steps; ++i) step();
+}
+
+// Run a *single* step
 function step() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
