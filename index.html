@@ -7,12 +7,27 @@
     <title>Tribes</title>
   </head>
   <body>
-    <div>
-      <button id="clear">Clear</button>
-      <input type="number" value="1" id="steps" min="1" />
-      <button id="step">Step</button>
+    <div style="display: flex; justify-content: center">
+      <div class="container">
+        <h1>Year 1</h1>
+        <canvas id="canvas" width="256" height="256"></canvas>
+        <div class="controls">
+          <button id="clear">Clear</button>
+          <div>
+            <input
+              type="number"
+              value="1"
+              id="steps"
+              min="1"
+              size="8"
+              style="text-align: right"
+              dir="rtl"
+            />
+            <button id="step">Step</button>
+          </div>
+        </div>
+        <script type="module" src="/src/main.ts"></script>
+      </div>
     </div>
-    <canvas id="canvas" width="256" height="256"></canvas>
-    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

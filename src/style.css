@@ -1,13 +1,40 @@
 * {
   margin: 0;
+  text-transform: uppercase;
 }
 
 body {
   background-color: #666;
+  color: black;
+  font-family: sans-serif;
+}
+
+h1 {
+  margin: 0.5em 0;
+}
+
+button {
+  /* background: white; */
+  /* border: none; */
+  height: 100%;
 }
 
 canvas {
   width: 512px;
   height: 512px;
   image-rendering: pixelated;
+  border: 1px solid black;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.controls {
+  margin: 0.5em 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
