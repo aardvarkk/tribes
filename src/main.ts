@@ -1,5 +1,7 @@
 import "./style.css";
 
+let year = 0; // Changes as we step
+
 const INTENSITIES = {
   EMPTY: 0xff,
   NATURE: [0xef, 0xd6, 0xa0, 0x88],
@@ -20,6 +22,12 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 clear();
 
+function setYear(newYear: number) {
+  year = newYear;
+  const title = document.getElementsByTagName("h1")[0];
+  title.innerText = `Year ${year}`;
+}
+
 function clear() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
@@ -27,6 +35,7 @@ function clear() {
     data[i] = 0xff;
   }
   ctx.putImageData(image, 0, 0);
+  setYear(0);
 }
 
 function getPx(data: Uint8ClampedArray, x: number, y: number): number {
@@ -63,5 +72,8 @@ function step() {
       }
     }
   }
+
   ctx.putImageData(image, 0, 0);
+
+  setYear(year + 1);
 }
