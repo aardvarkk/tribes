@@ -1,5 +1,7 @@
 import "./style.css";
 
+import birthdayUrl from "../birthday.jpg";
+
 let year = 0; // Changes as we step
 
 const INTENSITIES = {
@@ -53,6 +55,15 @@ function runSteps() {
   const steps = parseInt(
     (document.getElementById("steps") as HTMLInputElement).value
   );
+
+  if (steps === 40) {
+    const img = new Image();
+    img.src = birthdayUrl;
+    img.onload = () => ctx.drawImage(img, 0, 0);
+    setYear(40);
+    return;
+  }
+
   for (let i = 0; i < steps; ++i) step();
 }
 
