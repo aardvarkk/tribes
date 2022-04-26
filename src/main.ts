@@ -1,4 +1,5 @@
 import { rain } from "./nature/rain";
+import { regression } from "./decay/regression";
 import "./style.css";
 
 let year = 0; // Changes as we step
@@ -60,12 +61,16 @@ export function cumProb(ps: number[]) {
   for (let i = 1; i < ps.length; ++i) {
     cum[i] = cum[i - 1] + ps[i];
   }
+
+  if (Math.abs(cum[ps.length - 1] - 1) > 0.001) {
+    console.warn("Bad probability array", ps);
+  }
+
   return cum;
 }
 
 export function choose(probs: number[]) {
   const cum = cumProb(probs);
-  console.log(cum);
   const r = Math.random();
   for (let i = 0; i < cum.length; ++i) {
     if (r < cum[i]) {
@@ -89,8 +94,11 @@ function step() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
 
-  // NATURE
+  // NATURE: RAIN
   rain(data);
+
+  // DECAY: REGRESSION
+  regression(data);
 
   ctx.putImageData(image, 0, 0);
 

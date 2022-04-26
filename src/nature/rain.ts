@@ -1,20 +1,19 @@
 import { choose, getPx, INTENSITIES, setPx } from "../main";
 
 enum Weather {
-  NORMAL,
-  RAINY,
-  FERN_GULLY,
-  DRY,
-  DROUGHT,
+  NORMAL = "NORMAL",
+  RAINY = "RAINY",
+  FERN_GULLY = "FERN GULLY",
+  DRY = "DRY",
+  DROUGHT = "DROUGHT",
 }
 
 const PWeather = [0.6, 0.25, 0.01, 0.13, 0.01];
 
 export function rain(data: Uint8ClampedArray) {
-  console.log("NATURE: RAIN");
+  const weather = Object.values(Weather)[choose(PWeather)];
 
-  const weather = choose(PWeather) as Weather;
-  console.log("WEATHER", weather);
+  console.log("NATURE: RAIN -", weather);
 
   for (let y = 0; y < 256; ++y) {
     for (let x = 0; x < 256; ++x) {
