@@ -11,15 +11,9 @@ enum Regression {
 const PRegression = [0.9, 0.05, 0.04, 0.0095, 0.0005];
 
 export function regression(data: Uint8ClampedArray) {
-  let decay = Object.values(Regression)[choose(PRegression)];
+  const decay = Object.values(Regression)[choose(PRegression)];
 
   console.log("DECAY: REGRESSION -", decay);
-
-  // Special treatment for catastrophic... then just run as "normal" because normal decay is still in effect
-  if (decay === Regression.CATASTROPHIC) {
-    // TODO: Run catastrophe
-    decay = Regression.NORMAL;
-  }
 
   for (let y = 0; y < 256; ++y) {
     for (let x = 0; x < 256; ++x) {
@@ -27,6 +21,7 @@ export function regression(data: Uint8ClampedArray) {
 
       switch (decay) {
         case Regression.NORMAL:
+        case Regression.CATASTROPHIC: // Behaves as normal (then later we run catastrophe)
           if (value === INTENSITIES.NATURE[3] && Math.random() < 0.001) {
             setPx(data, x, y, INTENSITIES.NATURE[2]);
           } else if (
@@ -76,5 +71,10 @@ export function regression(data: Uint8ClampedArray) {
           break;
       }
     }
+  }
+
+  // Special treatment for catastrophic
+  if (decay === Regression.CATASTROPHIC) {
+    // TODO: Run catastrophe
   }
 }
