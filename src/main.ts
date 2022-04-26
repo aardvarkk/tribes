@@ -1,8 +1,9 @@
+import { rain } from "./nature/rain";
 import "./style.css";
 
 let year = 0; // Changes as we step
 
-const INTENSITIES = {
+export const INTENSITIES = {
   EMPTY: 0xff,
   NATURE: [0xef, 0xd6, 0xa0, 0x88],
   SHELTER: [0x75, 0x56, 0x35, 0x00],
@@ -19,7 +20,7 @@ const stepBtn = document.getElementById("step") as HTMLButtonElement;
 stepBtn.onclick = () => runSteps();
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-const ctx = canvas.getContext("2d")!;
+const ctx = canvas.getContext("2d", { alpha: false })!;
 clear();
 
 function setYear(newYear: number) {
@@ -38,14 +39,41 @@ function clear() {
   setYear(0);
 }
 
-function getPx(data: Uint8ClampedArray, x: number, y: number): number {
+export function getPx(data: Uint8ClampedArray, x: number, y: number): number {
   const idx = 4 * (y * WIDTH + x);
   return data[idx];
 }
 
-function setPx(data: Uint8ClampedArray, x: number, y: number, value: number) {
+export function setPx(
+  data: Uint8ClampedArray,
+  x: number,
+  y: number,
+  value: number
+) {
   const idx = 4 * (y * WIDTH + x);
   data[idx + 0] = data[idx + 1] = data[idx + 2] = value;
+}
+
+export function cumProb(ps: number[]) {
+  const cum = new Array(ps.length);
+  cum[0] = ps[0];
+  for (let i = 1; i < ps.length; ++i) {
+    cum[i] = cum[i - 1] + ps[i];
+  }
+  return cum;
+}
+
+export function choose(probs: number[]) {
+  const cum = cumProb(probs);
+  console.log(cum);
+  const r = Math.random();
+  for (let i = 0; i < cum.length; ++i) {
+    if (r < cum[i]) {
+      return i;
+    }
+  }
+
+  return cum.length - 1;
 }
 
 // Run one (or more) steps (save a bunch of clicking!)
@@ -61,17 +89,8 @@ function step() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
 
-  for (let y = 0; y < 256; ++y) {
-    for (let x = 0; x < 256; ++x) {
-      const value = getPx(data, x, y);
-
-      // Subphase 1
-      // Nature - new nature spawns from 0xff (empty) pixels
-      if (value === INTENSITIES.EMPTY && Math.random() < 0.01) {
-        setPx(data, x, y, INTENSITIES.NATURE[0]);
-      }
-    }
-  }
+  // NATURE
+  rain(data);
 
   ctx.putImageData(image, 0, 0);
 
