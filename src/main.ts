@@ -94,6 +94,8 @@ function step() {
   const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
   const data = image.data;
 
+  console.log("--- YEAR ", year, " ---");
+
   // NATURE: RAIN
   rain(data);
 
