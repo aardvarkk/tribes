@@ -11,8 +11,10 @@ export const INTENSITIES = {
   TRADE: [0x75, 0x56, 0x35, 0x00],
 };
 
-const WIDTH = 256;
-const HEIGHT = 256;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+
+export const WIDTH = canvas.width;
+export const HEIGHT = canvas.height;
 
 const clearBtn = document.getElementById("clear") as HTMLButtonElement;
 clearBtn.onclick = () => clear();
@@ -20,7 +22,6 @@ clearBtn.onclick = () => clear();
 const stepBtn = document.getElementById("step") as HTMLButtonElement;
 stepBtn.onclick = () => runSteps();
 
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d", { alpha: false })!;
 clear();
 

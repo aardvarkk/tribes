@@ -1,4 +1,4 @@
-import { choose, getPx, INTENSITIES, setPx } from "../main";
+import { choose, getPx, HEIGHT, INTENSITIES, setPx, WIDTH } from "../main";
 
 enum Regression {
   NORMAL = "NORMAL",
@@ -15,8 +15,8 @@ export function regression(data: Uint8ClampedArray) {
 
   console.log("DECAY: REGRESSION -", decay);
 
-  for (let y = 0; y < 256; ++y) {
-    for (let x = 0; x < 256; ++x) {
+  for (let y = 0; y < HEIGHT; ++y) {
+    for (let x = 0; x < WIDTH; ++x) {
       const value = getPx(data, x, y);
 
       switch (decay) {
