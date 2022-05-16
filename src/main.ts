@@ -1,15 +1,9 @@
 import { rain } from "./nature/rain";
 import { regression } from "./decay/regression";
 import "./style.css";
+import { elements } from "./nature/elements";
 
 let year = 0; // Changes as we step
-
-export const INTENSITIES = {
-  EMPTY: 0xff,
-  NATURE: [0xef, 0xd6, 0xa0, 0x88],
-  SHELTER: [0x75, 0x56, 0x35, 0x00],
-  TRADE: [0x75, 0x56, 0x35, 0x00],
-};
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
@@ -99,6 +93,9 @@ function step() {
 
   // NATURE: RAIN
   rain(data);
+
+  // NATURE: ELEMENTS
+  elements(data);
 
   // DECAY: REGRESSION
   regression(data);

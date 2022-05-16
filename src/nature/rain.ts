@@ -1,4 +1,5 @@
-import { choose, getPx, HEIGHT, INTENSITIES, setPx, WIDTH } from "../main";
+import { INTENSITIES } from "../intensities";
+import { choose, getPx, HEIGHT, setPx, WIDTH } from "../main";
 
 enum Weather {
   NORMAL = "NORMAL",

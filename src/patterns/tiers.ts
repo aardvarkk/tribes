@@ -4,4 +4,12 @@
 // ▩ Tier 3
 // ■ Tier 4
 
-export default null;
+import { INTENSITIES } from "../intensities";
+
+export const TIER_TO_NATURE = {
+  "⬚": undefined,
+  "▤": INTENSITIES.NATURE[0],
+  "▦": INTENSITIES.NATURE[1],
+  "▩": INTENSITIES.NATURE[2],
+  "■": INTENSITIES.NATURE[3],
+};
