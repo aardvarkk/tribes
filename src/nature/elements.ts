@@ -43,10 +43,10 @@ function matchPattern(
 }
 
 function replacePattern(
-  replace: number[][],
-  x: number,
-  y: number,
-  data: Uint8ClampedArray
+  _replace: number[][],
+  _x: number,
+  _y: number,
+  _data: Uint8ClampedArray
 ) {}
 
 function findAndReplace(
