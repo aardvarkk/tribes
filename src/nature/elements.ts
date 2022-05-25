@@ -1,5 +1,6 @@
 import { getPx, HEIGHT, setPx, WIDTH } from "../main";
 import FLOWER_A from "../patterns/flowerA";
+import FLOWER_B from "../patterns/flowerB";
 import { TIER_TO_NATURE } from "../patterns/tiers";
 
 function lineToTiers(line: string) {
@@ -96,24 +97,34 @@ function findAndReplace(
   }
 }
 
-export function elements(data: Uint8ClampedArray) {
-  console.log("NATURE: ELEMENTS");
+function basicClobber(
+  name: string,
+  data: Uint8ClampedArray,
+  elements: string[][],
+  probs: number[]
+) {
+  console.log("NATURE: ELEMENTS -", name);
 
-  const FLOWER_A_PROBS = [0.35, 0.25, 0.15, 0.05];
-
-  if (FLOWER_A_PROBS.length !== FLOWER_A.length) {
+  if (probs.length !== elements.length) {
     throw Error(
-      `${FLOWER_A_PROBS.length} probabilities !== ${FLOWER_A.length} elements`
+      `${probs.length} probabilities !== ${elements.length} elements`
     );
   }
 
   // Going in reverse "tier" is important
   // Otherwise we're likely to place an element
   // and then replace it with the next biggest one right away
-  const flowerA = [...FLOWER_A].reverse();
-  const probs = [...FLOWER_A_PROBS].reverse();
+  const elementsRev = [...elements].reverse();
+  const probsRev = [...probs].reverse();
 
-  flowerA.forEach(([find, replace], idx: number) => {
-    findAndReplace(data, find, replace, probs[idx]);
+  elementsRev.forEach(([find, replace], idx: number) => {
+    findAndReplace(data, find, replace, probsRev[idx]);
   });
+}
+
+export function elements(data: Uint8ClampedArray) {
+  console.log("NATURE: ELEMENTS");
+
+  basicClobber("FLOWER A", data, FLOWER_A, [0.35, 0.25, 0.15, 0.05]);
+  basicClobber("FLOWER B", data, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
 }
