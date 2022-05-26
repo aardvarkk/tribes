@@ -1,6 +1,7 @@
 import { getPx, HEIGHT, setPx, WIDTH } from "../main";
 import FLOWER_A from "../patterns/flowerA";
 import FLOWER_B from "../patterns/flowerB";
+import VINE_A from "../patterns/vineA";
 import { TIER_TO_NATURE } from "../patterns/tiers";
 
 function lineToTiers(line: string) {
@@ -64,8 +65,49 @@ function replacePattern(
   return true;
 }
 
+function newMatrix(m: number, n: number) {
+  return [...Array(m)].map(() => Array(n).fill(undefined));
+}
+
+function rotate(matrix: number[][], rotation: number): number[][] {
+  const m = matrix.length;
+  const n = matrix[0].length;
+
+  switch (rotation) {
+    case 0:
+      return matrix;
+    case 90:
+      const rot90 = newMatrix(n, m);
+      for (let y = 0; y < n; ++y) {
+        for (let x = 0; x < m; ++x) {
+          rot90[y][x] = matrix[m - 1 - x][y];
+        }
+      }
+      return rot90;
+    case 180:
+      const rot180 = newMatrix(m, n);
+      for (let y = 0; y < m; ++y) {
+        for (let x = 0; x < n; ++x) {
+          rot180[y][x] = matrix[m - 1 - y][n - 1 - x];
+        }
+      }
+      return rot180;
+    case 270:
+      const rot270 = newMatrix(n, m);
+      for (let y = 0; y < n; ++y) {
+        for (let x = 0; x < m; ++x) {
+          rot270[y][x] = matrix[x][n - 1 - y];
+        }
+      }
+      return rot270;
+    default:
+      throw rotation;
+  }
+}
+
 function findAndReplace(
   data: Uint8ClampedArray,
+  rotation: number,
   findStr: string,
   replaceStr: string,
   probability: number
@@ -73,8 +115,8 @@ function findAndReplace(
   // console.log(find.trim());
   // console.log(replace.trim());
 
-  const find = patternToArray(findStr);
-  const replace = patternToArray(replaceStr);
+  const find = rotate(patternToArray(findStr), rotation);
+  const replace = rotate(patternToArray(replaceStr), rotation);
 
   const replaceH = replace.length;
   const replaceW = replace[0].length;
@@ -90,7 +132,9 @@ function findAndReplace(
       }
 
       if (matchPattern(find, x, y, data)) {
-        // console.log(`Matched at (${x}, ${y}) with probability ${probability}`);
+        // console.log(
+        //   `Matched at (${x}, ${y}) with probability ${probability} and rotation ${rotation}`
+        // );
         replacePattern(replace, x, y, data);
       }
     }
@@ -118,13 +162,31 @@ function basicClobber(
   const probsRev = [...probs].reverse();
 
   elementsRev.forEach(([find, replace], idx: number) => {
-    findAndReplace(data, find, replace, probsRev[idx]);
+    findAndReplace(data, 0, find, replace, probsRev[idx]);
+  });
+}
+
+export type Pass = {
+  find: string;
+  replace: string;
+  rotations: number[];
+  prob: number;
+};
+
+function runPass(data: Uint8ClampedArray, pass: Pass) {
+  // For all rotations...
+  pass.rotations.forEach((rot) => {
+    if (pass.replace) {
+      findAndReplace(data, rot, pass.find, pass.replace, pass.prob);
+    }
   });
 }
 
 export function elements(data: Uint8ClampedArray) {
   console.log("NATURE: ELEMENTS");
 
-  basicClobber("FLOWER A", data, FLOWER_A, [0.35, 0.25, 0.15, 0.05]);
-  basicClobber("FLOWER B", data, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
+  // basicClobber("FLOWER A", data, FLOWER_A, [0.35, 0.25, 0.15, 0.05]);
+  // basicClobber("FLOWER B", data, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
+
+  VINE_A.forEach((pass) => runPass(data, pass));
 }
