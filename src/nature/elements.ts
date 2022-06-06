@@ -101,7 +101,31 @@ function rotate(matrix: number[][], rotation: number): number[][] {
       }
       return rot270;
     default:
-      throw rotation;
+      throw Error(`Unsupported rotation: ${rotation}`);
+  }
+}
+
+function rotateOffset(offset: Offset, rotation: number) {
+  switch (rotation) {
+    case 0:
+      return offset;
+    case 90:
+      return {
+        x: -offset.y,
+        y: offset.x,
+      };
+    case 180:
+      return {
+        x: -offset.x,
+        y: -offset.y,
+      };
+    case 270:
+      return {
+        x: offset.y,
+        y: -offset.x,
+      };
+    default:
+      throw Error(`Unsupported rotation: ${rotation}`);
   }
 }
 
@@ -110,13 +134,19 @@ function findAndReplace(
   rotation: number,
   findStr: string,
   replaceStr: string,
-  probability: number
+  probability: number,
+  offset?: Offset
 ) {
   // console.log(find.trim());
   // console.log(replace.trim());
 
   const find = rotate(patternToArray(findStr), rotation);
   const replace = rotate(patternToArray(replaceStr), rotation);
+
+  let rotatedOffset: Offset = { x: 0, y: 0 };
+  if (offset) {
+    rotatedOffset = rotateOffset(offset, rotation);
+  }
 
   const replaceH = replace.length;
   const replaceW = replace[0].length;
@@ -135,7 +165,12 @@ function findAndReplace(
         // console.log(
         //   `Matched at (${x}, ${y}) with probability ${probability} and rotation ${rotation}`
         // );
-        replacePattern(replace, x, y, data);
+        // if (offset) {
+        //   console.log(
+        //     `Rotated (${offset.x}, ${offset.y}) to (${rotatedOffset.x}, ${rotatedOffset.y})`
+        //   );
+        // }
+        replacePattern(replace, x + rotatedOffset.x, y + rotatedOffset.y, data);
       }
     }
   }
@@ -166,18 +201,31 @@ function basicClobber(
   });
 }
 
+export type Offset = {
+  x: number;
+  y: number;
+};
+
 export type Pass = {
   find: string;
   replace: string;
   rotations: number[];
   prob: number;
+  offset?: Offset;
 };
 
 function runPass(data: Uint8ClampedArray, pass: Pass) {
   // For all rotations...
   pass.rotations.forEach((rot) => {
     if (pass.replace) {
-      findAndReplace(data, rot, pass.find, pass.replace, pass.prob);
+      findAndReplace(
+        data,
+        rot,
+        pass.find,
+        pass.replace,
+        pass.prob,
+        pass.offset
+      );
     }
   });
 }
