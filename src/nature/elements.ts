@@ -130,7 +130,8 @@ function rotateOffset(offset: Offset, rotation: number) {
 }
 
 function findAndReplace(
-  data: Uint8ClampedArray,
+  read: Uint8ClampedArray,
+  write: Uint8ClampedArray,
   rotation: number,
   findStr: string,
   replaceStr: string,
@@ -161,7 +162,7 @@ function findAndReplace(
         continue;
       }
 
-      if (matchPattern(find, x, y, data)) {
+      if (matchPattern(find, x, y, read)) {
         // console.log(
         //   `Matched at (${x}, ${y}) with probability ${probability} and rotation ${rotation}`
         // );
@@ -170,7 +171,12 @@ function findAndReplace(
         //     `Rotated (${offset.x}, ${offset.y}) to (${rotatedOffset.x}, ${rotatedOffset.y})`
         //   );
         // }
-        replacePattern(replace, x + rotatedOffset.x, y + rotatedOffset.y, data);
+        replacePattern(
+          replace,
+          x + rotatedOffset.x,
+          y + rotatedOffset.y,
+          write
+        );
       }
     }
   }
@@ -178,7 +184,8 @@ function findAndReplace(
 
 function basicClobber(
   name: string,
-  data: Uint8ClampedArray,
+  read: Uint8ClampedArray,
+  write: Uint8ClampedArray,
   elements: string[][],
   probs: number[]
 ) {
@@ -197,7 +204,7 @@ function basicClobber(
   const probsRev = [...probs].reverse();
 
   elementsRev.forEach(([find, replace], idx: number) => {
-    findAndReplace(data, 0, find, replace, probsRev[idx]);
+    findAndReplace(read, write, 0, find, replace, probsRev[idx]);
   });
 }
 
@@ -214,12 +221,17 @@ export type Pass = {
   offset?: Offset;
 };
 
-function runPass(data: Uint8ClampedArray, pass: Pass) {
+function runPass(
+  read: Uint8ClampedArray,
+  write: Uint8ClampedArray,
+  pass: Pass
+) {
   // For all rotations...
   pass.rotations.forEach((rot) => {
     if (pass.replace) {
       findAndReplace(
-        data,
+        read,
+        write,
         rot,
         pass.find,
         pass.replace,
@@ -230,11 +242,11 @@ function runPass(data: Uint8ClampedArray, pass: Pass) {
   });
 }
 
-export function elements(data: Uint8ClampedArray) {
+export function elements(read: Uint8ClampedArray, write: Uint8ClampedArray) {
   console.log("NATURE: ELEMENTS");
 
-  basicClobber("FLOWER A", data, FLOWER_A, [0.35, 0.25, 0.15, 0.05]);
-  basicClobber("FLOWER B", data, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
+  basicClobber("FLOWER A", read, write, FLOWER_A, [0.35, 0.25, 0.15, 0.05]);
+  basicClobber("FLOWER B", read, write, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
 
-  VINE_A.forEach((pass) => runPass(data, pass));
+  VINE_A.forEach((pass) => runPass(read, write, pass));
 }

@@ -17,6 +17,14 @@ const stepBtn = document.getElementById("step") as HTMLButtonElement;
 stepBtn.onclick = () => runSteps();
 
 const ctx = canvas.getContext("2d", { alpha: false })!;
+
+// Double buffer -- read from one and write to the other
+const A = ctx.createImageData(WIDTH, HEIGHT);
+const B = ctx.createImageData(WIDTH, HEIGHT);
+
+let read: ImageData;
+let write: ImageData;
+
 clear();
 
 function setYear(newYear: number) {
@@ -25,13 +33,24 @@ function setYear(newYear: number) {
   title.innerText = `Year ${year}`;
 }
 
+function swap() {
+  ctx.putImageData(write, 0, 0);
+  read.data.set(write.data);
+  [read, write] = [write, read];
+}
+
 function clear() {
-  const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
-  const data = image.data;
-  for (let i = 0; i < image.data.length; ++i) {
-    data[i] = 0xff;
-  }
-  ctx.putImageData(image, 0, 0);
+  read = A;
+  write = B;
+
+  [read, write].forEach((imageData) => {
+    const data = imageData.data;
+    for (let i = 0; i < imageData.data.length; ++i) {
+      data[i] = 0xff;
+    }
+  });
+
+  swap();
   setYear(0);
 }
 
@@ -86,21 +105,17 @@ function runSteps() {
 
 // Run a *single* step
 function step() {
-  const image = ctx.getImageData(0, 0, WIDTH, HEIGHT);
-  const data = image.data;
-
   console.log("--- YEAR ", year, " ---");
 
   // NATURE: RAIN
-  rain(data);
+  rain(read.data, write.data);
 
   // NATURE: ELEMENTS
-  elements(data);
+  elements(read.data, write.data);
 
   // DECAY: REGRESSION
-  regression(data);
+  regression(read.data, write.data);
 
-  ctx.putImageData(image, 0, 0);
-
+  swap();
   setYear(year + 1);
 }
