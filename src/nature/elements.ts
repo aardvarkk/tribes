@@ -18,7 +18,8 @@ function matchPattern(
   find: number[][],
   x: number,
   y: number,
-  data: Uint8ClampedArray
+  data: Uint8ClampedArray,
+  fgMax: number
 ) {
   const findH = find.length;
   const findW = find[0].length;
@@ -26,16 +27,32 @@ function matchPattern(
   const startX = x - Math.trunc(findW / 2);
   const startY = y - Math.trunc(findH / 2);
 
+  const bgMatch = 0.8; // % of background that must match
+  let bgExp = 0;
+  let bgAct = 0;
+
   for (let dy = 0; dy < findH; ++dy) {
     for (let dx = 0; dx < findW; ++dx) {
-      if (find[dy][dx] === undefined) {
-        continue;
-      }
       const value = getPx(data, startX + dx, startY + dy);
-      if (value !== find[dy][dx]) {
+
+      // Expected to be background
+      if (find[dy][dx] === undefined) {
+        ++bgExp;
+        if (value > fgMax) {
+          ++bgAct;
+        }
+      }
+      // Value is not dark enough to match target
+      else if (value > find[dy][dx]) {
         return false;
       }
     }
+  }
+
+  // Not a close enough background match
+  if (bgAct / bgExp < bgMatch) {
+    // console.log(`${bgAct}/${bgExp} < ${bgMatch}`);
+    return false;
   }
 
   return true;
@@ -144,6 +161,18 @@ function findAndReplace(
   const find = rotate(patternToArray(findStr), rotation);
   const replace = rotate(patternToArray(replaceStr), rotation);
 
+  let fgMax = Number.NEGATIVE_INFINITY;
+  for (let y = 0; y < find.length; ++y) {
+    for (let x = 0; x < find[y].length; ++x) {
+      const v = find[y][x];
+      if (v !== undefined) {
+        fgMax = Math.max(fgMax, v);
+      }
+    }
+  }
+
+  // console.log({ fgMax });
+
   let rotatedOffset: Offset = { x: 0, y: 0 };
   if (offset) {
     rotatedOffset = rotateOffset(offset, rotation);
@@ -162,7 +191,7 @@ function findAndReplace(
         continue;
       }
 
-      if (matchPattern(find, x, y, read)) {
+      if (matchPattern(find, x, y, read, fgMax)) {
         // console.log(
         //   `Matched at (${x}, ${y}) with probability ${probability} and rotation ${rotation}`
         // );
