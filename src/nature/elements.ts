@@ -3,6 +3,7 @@ import FLOWER_A from "../patterns/flowerA";
 import FLOWER_B from "../patterns/flowerB";
 import VINE_A from "../patterns/vineA";
 import { TIER_TO_NATURE } from "../patterns/tiers";
+import HUMPS from "../patterns/humps";
 
 function lineToTiers(line: string) {
   return [...line].map(
@@ -278,4 +279,5 @@ export function elements(read: Uint8ClampedArray, write: Uint8ClampedArray) {
   basicClobber("FLOWER B", read, write, FLOWER_B, [0.35, 0.25, 0.15, 0.05]);
 
   VINE_A.forEach((pass) => runPass(read, write, pass));
+  HUMPS.forEach((pass) => runPass(read, write, pass));
 }
